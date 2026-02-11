@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 // Schema do Produto
 const productSchema = new mongoose.Schema({
+  fakestoreId: {
+    type: Number,
+    unique: true,
+    sparse: true,
+    index: true
+  },
   title: {
     type: String,
     required: true,

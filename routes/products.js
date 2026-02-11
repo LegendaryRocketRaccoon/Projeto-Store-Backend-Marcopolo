@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Product = require('../models/Product');
 
 // GET /products - Obter todos os produtos
@@ -76,24 +77,27 @@ router.get('/category/:category', async (req, res) => {
 // GET /products/:id - Obter um produto específico
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    
-    if (!product) {
-      return res.status(404).json({
-        error: 'Produto não encontrado'
-      });
+    const { id } = req.params;
+    let product = null;
+
+    if (mongoose.isValidObjectId(id)) {
+      product = await Product.findById(id);
     }
-    
+
+    if (!product) {
+      const numericId = Number(id);
+      if (!Number.isNaN(numericId)) {
+        product = await Product.findOne({ fakestoreId: numericId });
+      }
+    }
+
+    if (!product) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
     res.json(product);
   } catch (error) {
-    if (error.kind === 'ObjectId') {
-      return res.status(404).json({
-        error: 'Produto não encontrado'
-      });
-    }
-    res.status(500).json({
-      error: error.message
-    });
+    res.status(500).json({ error: error.message });
   }
 });
 
