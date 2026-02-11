@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const axios = require('axios');
+const https = require('https');
 const Product = require('./models/Product');
 
 dotenv.config();
@@ -15,7 +16,8 @@ const seedDatabase = async () => {
     console.log('Conectado ao MongoDB');
 
     console.log('Buscando produtos em https://fakestoreapi.com/products ...');
-    const response = await axios.get('https://fakestoreapi.com/products');
+    const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+    const response = await axios.get('https://fakestoreapi.com/products', { httpsAgent });
     const products = response.data;
 
     if (!Array.isArray(products) || products.length === 0) {
