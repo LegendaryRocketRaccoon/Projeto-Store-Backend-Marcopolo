@@ -10,21 +10,21 @@ const items = [
     fakestoreId: 1,
     title: 'Headset',
     price: 299.9,
-    category: 'acessórios de informática',
+    category: 'computer accessories',
     image: 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS-CC1RXXYZ8k5d4MOUIAWdvop8Jxy_iXcfhio5RMM_d45qbnqCZ1ZhzWSk4UgazGVbnWxzenZnlVQh3l2PqUKPNP4KUUZcaiHny_mzo5C7Zt74U0bvo8rg36bLzxvvlx_I2unaFio&usqp=CAc'
   },
   {
     fakestoreId: 2,
     title: 'camiseta azul',
     price: 39.99,
-    category: 'vestuário',
+    category: 'clothing',
     image: 'https://images.tcdn.com.br/img/img_prod/1103332/camiseta_adulto_azul_royal_sublimatica_739796345_1_7fb0c945d85b498676f5370980be1f8f.png'
   },
   {
     fakestoreId: 3,
     title: 'O Senhor dos Anéis Box Trilogy',
     price: 119.5,
-    category: 'livros',
+    category: 'books',
     image: 'https://m.media-amazon.com/images/I/715afDdgKfL.jpg'
   }
 ];
