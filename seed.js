@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/*const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const axios = require('axios');
 const https = require('https');
@@ -55,4 +55,4 @@ const seedDatabase = async () => {
   }
 };
 
-seedDatabase();
+seedDatabase();*/

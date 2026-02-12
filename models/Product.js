@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Schema do Produto
 const productSchema = new mongoose.Schema({
   fakestoreId: {
     type: Number,
@@ -46,7 +45,7 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Índices para melhorar performance nas buscas
+
 productSchema.index({ title: 'text', description: 'text' });
 productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
