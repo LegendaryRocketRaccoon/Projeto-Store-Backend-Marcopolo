@@ -27,7 +27,7 @@ const seedDatabase = async () => {
 
     // Limpar banco
     await Product.deleteMany({});
-    console.log('Banco de dados limpo!');
+    console.log('Banco de dados limpo.');
 
     // Mapear produtos para o formato do schema (incluir fakestoreId)
     const mapped = products.map(p => ({
@@ -41,7 +41,7 @@ const seedDatabase = async () => {
     }));
 
     const createdProducts = await Product.insertMany(mapped);
-    console.log(`${createdProducts.length} produtos criados!`);
+    console.log(`${createdProducts.length} produtos criados.`);
 
     const categories = await Product.distinct('category');
     console.log('\nCategorias disponíveis:');
