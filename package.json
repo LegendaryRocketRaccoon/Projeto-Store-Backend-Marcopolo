@@ -1,7 +1,7 @@
 {
   "name": "fakestore-api",
   "version": "1.0.0",
-  "description": "API REST para e-commerce (Projeto FakeStore)",
+  "description": "Projeto FakeStore",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

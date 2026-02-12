@@ -3,25 +3,19 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 
-// Para importar rotas
 const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
 
-// Para configurar variáveis de ambiente
 dotenv.config();
 
-// Para criar app Express
 const app = express();
 
-// Para conectar ao banco de dados
 connectDB();
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rota de teste
 app.get('/', (req, res) => {
   res.json({
     message: 'FakeStore API - Projeto E-commerce',
@@ -37,11 +31,11 @@ app.get('/', (req, res) => {
   });
 });
 
-// Rotas da API
+
 app.use('/products', productRoutes);
 app.use('/products/categories', categoryRoutes);
 
-// Middleware de erro
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
@@ -52,7 +46,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Rota 404
+
 app.use((req, res) => {
   res.status(404).json({
     error: {
@@ -62,9 +56,11 @@ app.use((req, res) => {
   });
 });
 
-// Iniciar servidor
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
   console.log(`Ambiente: ${process.env.NODE_ENV}`);
+  console.log(`http://localhost:3000/`);
+
 });

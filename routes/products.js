@@ -3,15 +3,12 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
 
-// GET /products - Obter todos os produtos
-// Suporta query params: sort, limit, search
 router.get('/', async (req, res) => {
   try {
     const { sort, limit, search } = req.query;
     
     let query = {};
     
-    // Busca por texto
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -21,15 +18,13 @@ router.get('/', async (req, res) => {
     
     let productsQuery = Product.find(query);
     
-    // Ordenação
+
     if (sort) {
-      // Exemplos: sort=price_asc, sort=price_desc, sort=title_asc, sort=title_desc
       const [field, order] = sort.split('_');
       const sortOrder = order === 'desc' ? -1 : 1;
       productsQuery = productsQuery.sort({ [field]: sortOrder });
     }
     
-    // Limitar resultados
     if (limit) {
       productsQuery = productsQuery.limit(parseInt(limit));
     }
@@ -44,7 +39,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /products/category/:category - Obter produtos por categoria
 router.get('/category/:category', async (req, res) => {
   try {
     const { category } = req.params;
@@ -52,14 +46,12 @@ router.get('/category/:category', async (req, res) => {
     
     let productsQuery = Product.find({ category });
     
-    // Ordenação
     if (sort) {
       const [field, order] = sort.split('_');
       const sortOrder = order === 'desc' ? -1 : 1;
       productsQuery = productsQuery.sort({ [field]: sortOrder });
     }
     
-    // Limitar resultados
     if (limit) {
       productsQuery = productsQuery.limit(parseInt(limit));
     }
@@ -74,7 +66,6 @@ router.get('/category/:category', async (req, res) => {
   }
 });
 
-// GET /products/:id - Obter um produto específico
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
