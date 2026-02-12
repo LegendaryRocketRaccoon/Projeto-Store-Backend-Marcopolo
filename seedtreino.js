@@ -9,12 +9,13 @@ const items = [
     fakestoreId: 1,
     title: 'Headset',
     price: 299.9,
+    description: 'Headset Gamer com som surround 7.1, microfone com cancelamento de ruído e iluminação RGB personalizável.',
     category: 'computer accessories',
     image: 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS-CC1RXXYZ8k5d4MOUIAWdvop8Jxy_iXcfhio5RMM_d45qbnqCZ1ZhzWSk4UgazGVbnWxzenZnlVQh3l2PqUKPNP4KUUZcaiHny_mzo5C7Zt74U0bvo8rg36bLzxvvlx_I2unaFio&usqp=CAc'
   },
   {
     fakestoreId: 2,
-    title: 'camiseta azul',
+    title: 'Camiseta Azul',
     price: 39.99,
     category: 'clothing',
     image: 'https://images.tcdn.com.br/img/img_prod/1103332/camiseta_adulto_azul_royal_sublimatica_739796345_1_7fb0c945d85b498676f5370980be1f8f.png'
