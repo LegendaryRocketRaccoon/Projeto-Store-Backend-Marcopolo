@@ -13,7 +13,6 @@ const CategorySchema = new mongoose.Schema({
   sortOrder: { type: Number, default: 0 }
 }, { timestamps: true });
 
-
 CategorySchema.pre('save', async function (next) {
   if (!this.isModified('parentId') && !this.isNew) return next();
 

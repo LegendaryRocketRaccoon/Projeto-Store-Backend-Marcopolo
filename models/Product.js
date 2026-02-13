@@ -12,10 +12,6 @@ const productSchema = new mongoose.Schema({
   price: { type: Number, required: true, min: 0, index: true },
   description: { type: String, required: true },
 
-  
-  category: { type: String, required: true },
-
-
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category', index: true }],
 
   image: { type: String, required: true },
@@ -28,7 +24,6 @@ const productSchema = new mongoose.Schema({
 
 productSchema.index({ title: 'text', description: 'text' });
 productSchema.index({ price: 1 });
-
 
 module.exports = mongoose.model('Product', productSchema);
 ``

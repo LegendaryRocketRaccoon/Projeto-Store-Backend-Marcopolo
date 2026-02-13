@@ -54,34 +54,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/category/:category', async (req, res) => {
-  try {
-    const { category } = req.params;
-    const { sort, limit } = req.query;
-
-    const filter = { isActive: true, category };
-    let productsQuery = Product.find(filter);
-
-    if (sort) {
-      const [field, order] = String(sort).split('_');
-      const safeFields = ['price', 'title', 'createdAt'];
-      const safeField = safeFields.includes(field) ? field : 'createdAt';
-      const sortOrder = order === 'asc' ? 1 : -1;
-      productsQuery = productsQuery.sort({ [safeField]: sortOrder });
-    }
-
-    if (limit) {
-      const n = parseInt(limit, 10);
-      if (!Number.isNaN(n) && n > 0 && n <= 100) productsQuery = productsQuery.limit(n);
-    }
-
-    const products = await productsQuery.lean();
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

@@ -23,8 +23,8 @@ app.get('/', (req, res) => {
       products: {
         list: '/products',
         detail: '/products/:id',
-        byCategorySlug: '/products?category=:slug',   // novo
-        legacyByCategoryString: '/products/category/:category' // legado
+        byCategorySlug: '/products?category=:slug',
+        legacyByCategoryString: '/products/category/:category'
       },
       categories: {
         listRoots: '/categories?parent=root',
