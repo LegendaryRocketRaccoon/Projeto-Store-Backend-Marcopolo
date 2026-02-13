@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/*const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
   fakestoreId: {
@@ -26,4 +26,4 @@ productSchema.index({ title: 'text', description: 'text' });
 productSchema.index({ price: 1 });
 
 module.exports = mongoose.model('Product', productSchema);
-``
+``*/

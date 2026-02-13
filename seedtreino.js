@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/*const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 const Product = require('./models/Product');
@@ -205,4 +205,4 @@ async function run() {
   }
 }
 
-run();
+run();*/

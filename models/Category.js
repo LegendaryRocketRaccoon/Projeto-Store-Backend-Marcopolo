@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/*const mongoose = require('mongoose');
 
 const CategorySchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
@@ -33,4 +33,4 @@ CategorySchema.pre('save', async function (next) {
 });
 
 module.exports = mongoose.model('Category', CategorySchema);
-``
+``*/

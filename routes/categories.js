@@ -1,87 +1,111 @@
 const express = require('express');
 const router = express.Router();
-const Category = require('../models/Category');
-const { toSlug } = require('../utils/slug');
+const { getDB } = require('../config/database');
+const { toObjectId, now, pick } = require('../utils/validators');
 
 router.get('/', async (req, res) => {
   try {
-    const { parent = 'root' } = req.query;
-    const filter = parent === 'root' ? { parentId: null } : { parentId: parent };
-    const items = await Category.find(filter).sort({ sortOrder: 1, name: 1 }).lean();
-    res.json(items);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const db = getDB();
+    const col = db.collection('categories');
+
+    const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+    const pageSize = Math.min(Math.max(parseInt(req.query.pageSize || '50', 10), 1), 100);
+
+    const cursor = col.find({}).sort({ createdAt: -1 }).skip((page - 1) * pageSize).limit(pageSize);
+    const [items, total] = await Promise.all([cursor.toArray(), col.countDocuments({})]);
+
+    res.json({ items, page, pageSize, total });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
-router.get('/tree', async (_req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const items = await Category.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean();
-    const byId = Object.fromEntries(items.map(c => [String(c._id), { ...c, children: [] }]));
-    const roots = [];
-    items.forEach(c => {
-      if (c.parentId) byId[String(c.parentId)]?.children.push(byId[String(c._id)]);
-      else roots.push(byId[String(c._id)]);
-    });
-    res.json(roots);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    const db = getDB();
+    const col = db.collection('categories');
+    const _id = toObjectId(req.params.id);
+    if (!_id) return res.status(400).json({ error: 'ID inválido' });
 
-router.get('/:slug', async (req, res) => {
-  try {
-    const category = await Category.findOne({ slug: req.params.slug }).lean();
-    if (!category) return res.status(404).json({ message: 'Categoria não encontrada' });
-    const breadcrumb = [...(category.ancestors || []), { _id: category._id, slug: category.slug, name: category.name }];
-    res.json({ category, breadcrumb });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const doc = await col.findOne({ _id });
+    if (!doc) return res.status(404).json({ error: 'Categoria não encontrada' });
+
+    res.json(doc);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
 router.post('/', async (req, res) => {
   try {
-    const { name, parentId, isActive = true, sortOrder = 0 } = req.body;
-    const slug = toSlug(req.body.slug || name);
-    const exists = await Category.findOne({ slug }).lean();
-    if (exists) return res.status(409).json({ message: 'Slug já existe' });
+    const db = getDB();
+    const col = db.collection('categories');
+    const payload = pick(req.body, ['name', 'description']);
 
-    const created = await Category.create({ name, slug, parentId: parentId || null, isActive, sortOrder });
-    res.status(201).json(created);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (!payload.name || typeof payload.name !== 'string') {
+      return res.status(400).json({ error: 'name é obrigatório' });
+    }
+
+    const doc = {
+      name: payload.name.trim(),
+      description: (payload.description || '').trim(),
+      createdAt: now(),
+      updatedAt: now()
+    };
+
+    const result = await col.insertOne(doc);
+    res.status(201).json({ ...doc, _id: result.insertedId });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
 router.patch('/:id', async (req, res) => {
   try {
-    const cat = await Category.findById(req.params.id);
-    if (!cat) return res.status(404).json({ message: 'Categoria não encontrada' });
+    const db = getDB();
+    const col = db.collection('categories');
+    const _id = toObjectId(req.params.id);
+    if (!_id) return res.status(400).json({ error: 'ID inválido' });
 
-    const { name, parentId, isActive, sortOrder, slug } = req.body;
-    if (name) cat.name = name;
-    if (slug) cat.slug = toSlug(slug);
-    if (typeof isActive === 'boolean') cat.isActive = isActive;
-    if (typeof sortOrder === 'number') cat.sortOrder = sortOrder;
-    if (parentId !== undefined) cat.parentId = parentId || null;
+    const payload = pick(req.body, ['name', 'description']);
+    const update = {};
+    if (payload.name) update.name = payload.name.trim();
+    if (payload.description !== undefined) update.description = (payload.description || '').trim();
 
-    await cat.save();
-    res.json(cat);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (Object.keys(update).length === 0) {
+      return res.status(400).json({ error: 'Nada para atualizar' });
+    }
+    update.updatedAt = now();
+
+    const result = await col.findOneAndUpdate({ _id }, { $set: update }, { returnDocument: 'after' });
+    if (!result.value) return res.status(404).json({ error: 'Categoria não encontrada' });
+
+    res.json(result.value);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
 router.delete('/:id', async (req, res) => {
   try {
-    const hasChildren = await Category.exists({ parentId: req.params.id });
-    if (hasChildren) return res.status(409).json({ message: 'Remova/mova as subcategorias antes' });
+    const db = getDB();
+    const categories = db.collection('categories');
+    const products = db.collection('products');
 
-    await Category.findByIdAndDelete(req.params.id);
+    const _id = toObjectId(req.params.id);
+    if (!_id) return res.status(400).json({ error: 'ID inválido' });
+
+    const referenced = await products.findOne({ category: _id }, { projection: { _id: 1 } });
+    if (referenced) {
+      return res.status(409).json({ error: 'Há produtos vinculados à categoria. Remova/mova-os antes.' });
+    }
+
+    const result = await categories.deleteOne({ _id });
+    if (result.deletedCount === 0) return res.status(404).json({ error: 'Categoria não encontrada' });
+
     res.status(204).end();
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
